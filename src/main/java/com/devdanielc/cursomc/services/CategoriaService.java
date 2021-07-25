@@ -3,10 +3,12 @@ package com.devdanielc.cursomc.services;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.devdanielc.cursomc.domain.Categoria;
 import com.devdanielc.cursomc.repositories.CategoriaRepository;
+import com.devdanielc.cursomc.services.exceptions.DataIntegrityException;
 import com.devdanielc.cursomc.services.exceptions.ObjectNotFoundException;
 
 
@@ -30,6 +32,16 @@ public class CategoriaService {
 	public Categoria update(Categoria obj) {
 		find(obj.getId());
 		return repo.save(obj);
+	}
+	
+	public void delete(Integer id) {
+		find(id);
+		try {
+			repo.deleteById(id);
+		}catch (DataIntegrityViolationException e) {
+			throw new DataIntegrityException("Não é possivel apagar uma categoria que tem produtos");
+		}
+		
 	}
 
 }
